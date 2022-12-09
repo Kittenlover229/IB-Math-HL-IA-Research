@@ -17,30 +17,32 @@
 \section{Introduction}
 \subsection{Rationale}
 Not longer than two days ago I was challenged to a mathematical standoff by a 
-good friend of mine, the battlefield would be polynomial functions and their 
+good friend of mine, the weapons would be polynomial functions and their 
 graphs. Winning this competition was a matter of honor, so I used all of my 
 skill and wits to prepare. The fight would be held in \mbox{"Graph Wars"}, a 
 small competitive 1v1 game published on the 23rd of February 2022. 
 
 The goal of the game is to design a function that can be plotted from one point
-to another without intersecting any circles faster than your opponent. This
-is wrapped into a war-like setting where your function is a projectile, directed
-by your soldiers against your common foes.
+to another without intersecting any circles in shortest time. You are given 
+60 seconds to input as many functions as you want, then the turn is passed onto
+your opponent.
+This is wrapped into a war-like setting where your function is a projectile, 
+directed by your soldiers against your enemy's.
 
 It is also usually played without assistance of any external programs like 
-graph plotters or calculators, that's for good reason. Most importantly, game is
+plotters or calculators, that's for good reason. Most importantly, game is
 considered solved: for any initial state of the field there can be deduced a 
 function to guarantee a "hit". 
 
 \subsection{Aim}
-I would want th algorithm to be fully automate, so my ultimate goal 
-set out to be simply designing an algorithm, which when given a list of all
-circle obstacles, their radii, and the edge points would express the path to
-go from to another without colliding with any of the collided obstacles.
+My ultimate goal  set out to be simply designing an algorithm, which when given
+a list of all circle obstacles, their radii, and the edge points would express
+the path to go from to another without colliding with any of the obstacles. 
 
 \section{Investigation}
 The task consists of the small independents subtasks: finding the points and 
-fitting the function. 
+fitting the function. Task-specific restrictions are mentioned in the 
+corresponding section.
 
 \subsection{Finding The Points}
 This problem can be boiled down to pathfinding. However, usual pathfinding
@@ -144,6 +146,10 @@ the game accounts for that and intentionally avoids it.
 \TODO
 
 \section{Conclusion}
+\TODO
+
+\section{Bibliography}
+\appendix
 \TODO
 
 \end{document}
