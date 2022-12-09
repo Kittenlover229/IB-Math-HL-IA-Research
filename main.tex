@@ -60,11 +60,51 @@ is not, we need to convert it to one. Cells of the grid can be in two states:
 occupied or empty. The occupied cells are the ones covered by an obstacle. 
 Since obstacle circles only occur at integer coordinates and the smallest
 radius of a circle is 1, we can safely assume that the smallest size of a grid
-cell we might need is 1 respectively. After that we can apply the A* pathfinding
-algorithm to yield us a set of points $A$, those are the points that the
-function should go through. 
+cell we might need is 1 respectively. After that we can apply the \textbf{Theta*}.
+It is preferable to Dijkstra's, A* and others since it is designed to fit
+any-angle pathfinding. Even though our points are aligned on a grid,
+the "projectile" is allowed to move in all directions, not just the cardinal ones. 
+Only additional piece of information it requires is a line of sight function ($L$).
+Let $I(A, B)$ be some function, equal to the amount of intersections of a 
+line between points $A$ and $B$  with all the circles of a set $C$ containing 
+$\langle x, y, r \rangle$. So $I_i(A, B)$ is the amount of intersections
+of a line from $A$ to $B$ with some circle $C_i$. 
+Using that we can define $I(A, B) = \sum_{i=1}^{|C|}I_i(A, B)$.
 
-\TODO{}
+For simplicity let's assume the circle is at $\langle 0, 0 \rangle$ with
+some radius $r$. The \textbf{line} of sight between two points $p_1$ and $p_2$
+can be expressed as some $y = kx + b'$. 
+But first let's find the point ($x_0, y_0$) on the line closest to the circle.
+If we rearrange our equation to be $ax + by + c = 0$ we can for sure say that 
+vector $\vec{v^{\star\star}} = (a, b)$ will be perpendicular to the line.
+
+\begin{equation}
+    k = \frac{p_{1_y} - p_{2_y}}{p_{1_x} - p_{2_x}}
+\end{equation}
+\begin{equation}
+    b' = p_{1_x}
+\end{equation}
+
+on the line should be proportional to the vector $\vec{v^{\star\star}}$ too. 
+Furthermore, the distance
+of this point from the origin is $d = \frac{|c|}{\sqrt{a^2 + b^2}}$.
+Now we may just normalize the vector to the length (distance from origin).
+
+\begin{equation}
+    \vec{v^\star}=\left(a * \frac{c}{a^2 + b^2}, b * \frac{c}{a^2 + b^2}\right)
+\end{equation}
+
+This vector is inverted, so by multiplying everything by $-1$ we get the coordinates
+of the point
+
+\begin{equation}
+    x_0 = -a * \frac{c}{a^2 + b^2}
+\end{equation}
+\begin{equation}
+    y_0 = -b * \frac{c}{a^2 + b^2}
+\end{equation}
+
+\TODO
 
 \subsection{Fitting The Function}
 Let $A$ be a set of cardinality $n$ where each point is like $\langle x, y \rangle$.
@@ -152,24 +192,35 @@ like the following.
 $$f(x) = \sum_{i=1}^{|A|}\psi_i(x)$$
 $$\psi_i(x) = y_i \phi_i(x)$$
 \begin{equation}
-    \phi_i = \prod_{j=0, j \neq i}^{|A|}\frac{x - x_j}{x_i - x_j}
+    \phi_i = \prod_{j=1, j \neq i}^{|A|}\frac{x - x_j}{x_i - x_j}
 \end{equation}
 \begin{equation}
-f(x) = \sum_{i=1}^{|A|} \left(y_i * \prod_{j=0, j \neq i}^{|A|} \frac{x - x_j}{x_i - x_j}\right)
+f(x) = \sum_{i=1}^{|A|} \left(y_i * \prod_{j=1, j \neq i}^{|A|} \frac{x - x_j}{x_i - x_j}\right)
 \end{equation}
 
-\section{Limitations}
-This method covers a lot of scenarios, but it doesn't yield correct results
+\section{Limitations \& Reflection}
+I used a geometric approach to finding intersections of lines with circles.
+The algebraic solution has a higher computational error due to imprecisions 
+when using floating-point arithmetic. This doesn't impact the current usecase,
+however can be important when dealing with more fine point placement.
+
+The described method of fitting covers a lot of scenarios, but it doesn't yield 
+correct results
 when the next intended path point $a_{i + 1}$ on the path which goes after 
-some $a_i$. In this case the pathfinding algorithm requires the path to turn back,
+some $a_i$. In this case the pathfinding algorithm requires a path to turn back,
 which is impossible to do. This issue is most visible when reindexing: the order
 of points will be changed. Beyond that, this arises only in situations when the 
-$f(x)$ can't be a well-defined function, since that requires it to have to
+$f(x)$ \textbf{can't be a well-defined function}, since that requires it to have to
 two different values at same $x$. Luckily, those scenarios never occured in a 
 real game. Perhaps the game accounts for that and intentionally avoids it.
 
-\section{Reflection}
-\TODO
+My method produces good results on the given dataset of densely packed points,
+however, the more spread apart the points are the greater the algorithm
+overshoots in spaces between two points. That can be a problem since it may 
+actually accidentally go through one of the spheres. This effect can be
+mitigated by sampling more intermediate points, which in turn increases 
+computational complexity. Since the game field is  limited to span 100 units
+horizontally and 40 units vertically this is not a big problem. 
 
 \section{Conclusion}
 \TODO
