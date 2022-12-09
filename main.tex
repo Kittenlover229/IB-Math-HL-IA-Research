@@ -74,7 +74,7 @@ Using that we can define $I(A, B) = \sum_{i=1}^{|C|}I_i(A, B)$.
 For simplicity let's assume the circle is at $\langle 0, 0 \rangle$ with
 some radius $r$. The \textbf{line} of sight between two points $p_1$ and $p_2$
 can be expressed as some $y = kx + b'$. 
-But first let's find the point ($x_0, y_0$) on the line closest to the circle.
+But first let's find the point ($p_0 = (x_0, y_0)$) on the line closest to the circle.
 If we rearrange our equation to be $ax + by + c = 0$ we can for sure say that 
 vector $\vec{v^{\star\star}} = (a, b)$ will be perpendicular to the line.
 
@@ -85,17 +85,17 @@ vector $\vec{v^{\star\star}} = (a, b)$ will be perpendicular to the line.
     b' = p_{1_x}
 \end{equation}
 
-on the line should be proportional to the vector $\vec{v^{\star\star}}$ too. 
+Coordiantes of $p_0$ should be proportional to the vector $\vec{v^{\star\star}}$. 
 Furthermore, the distance
-of this point from the origin is $d = \frac{|c|}{\sqrt{a^2 + b^2}}$.
+of $p_0$ from the origin is $d = \frac{|c|}{\sqrt{a^2 + b^2}}$.
 Now we may just normalize the vector to the length (distance from origin).
 
 \begin{equation}
     \vec{v^\star}=\left(a * \frac{c}{a^2 + b^2}, b * \frac{c}{a^2 + b^2}\right)
 \end{equation}
 
-This vector is inverted, so by multiplying everything by $-1$ we get the coordinates
-of the point
+This vector is inverted, so by multiplying everything by $-1$ we get the actual 
+coordinates of the point.
 
 \begin{equation}
     x_0 = -a * \frac{c}{a^2 + b^2}
