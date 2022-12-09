@@ -1,8 +1,12 @@
 \documentclass[12pt, titlepage]{article}
+\usepackage[skip=5pt plus1pt, indent=20pt]{parskip}
+\usepackage{indentfirst}
 \usepackage[utf8]{inputenc}
+\usepackage[datesep=/,style=ddmmyyyy]{datetime2}
 \usepackage{xcolor}
 \usepackage[english]{babel}
 \newcommand{\TODO}{\begin{center}\color{red}TODO\end{center}}
+\newcommand\wordcount{\input{|"texcount -inc -sum -0 -template={SUM} \jobname.tex"}}
 
 \title{Obstacle-avoidant Function Fitting}
 
@@ -13,6 +17,11 @@
 \begin{document}
 \maketitle
 \tableofcontents
+
+{
+\centering
+Document compiled \today, made with \LaTeX.
+}
 
 \section{Introduction}
 \subsection{Rationale}
@@ -98,7 +107,14 @@ so it is $1$ at $x_2$.
 \begin{equation}
     \phi_2(x) = \frac{(x - 0)(x - 17)(x - 19)}{(6 - 0)(6 - 17)(6 - 19)}
 \end{equation}
-$$\phi_2(x_1) = 0, \phi_2(x_2) = 1\\,\phi_2(x_3) = 0\\, \phi_2(x_4) = 0\\$$
+
+{
+\centering
+\begin{tabular}{c|c c c c}
+    $x$ & $x_1$ & $x_2$ & $x_3$ & $x_4$ \\
+    $\phi_2(x)$ & $0$ & $1$ & $0$ & $0$ \\
+\end{tabular}\par
+}
 
 To make $\phi_i$ completely representative of the point at $x_i$ we need to 
 scale it by $y_i$. Let's define a new helper function $\psi_i(x)$.
@@ -109,14 +125,28 @@ scale it by $y_i$. Let's define a new helper function $\psi_i(x)$.
 \begin{equation}
     \psi_2(x) = \frac{(x - x_1)(x - x_3)(x - x_4)}{(x_2 - x_1)(x_2 - x_3)(x_2 - x_4)} * y_2
 \end{equation}
-$$\psi_2(x_1) = 0, \psi_2(x_2) = 9\\,\psi_2(x_3) = 0\\, \psi_2(x_4) = 0\\$$
+
+Based on this we can express $\psi_i(x)$'s values for any $x_i$.
+
+{
+\centering
+\begin{tabular}{c|c c c c}
+    & $\psi_1(x) $ & $\psi_2(x)$ & $\psi_3(x)$ & $\psi_4(x)$ \\
+    \hline
+    $x_1$ & $y_1$ & $0$ & $0$ & $0$ \\
+    $x_2$ & $0$ & $y_2$ & $0$ & $0$ \\
+    $x_3$ & $0$ & $0$ & $y_3$ & $0$ \\
+    $x_4$ & $0$ & $0$ & $0$ & $y_4$ \\
+\end{tabular}\par
+}
 
 Looking at the table of all the values of $\psi_i$ we can deducde that their linear
 combination will satisfy our condition of $\psi_i(x_i) = y_i$ and 
-$\psi_i(x_j) = 0, j \neq i$. So for the example set $A$ the fit function is 
-$$f(x) = \psi_1(x) + \psi_2(x) + \psi_3(x) + \psi_4(x)$$
+$\psi_i(x_j) = 0, j \neq i$, yielding an $|A|$th order polynomial. 
+So for the example set $A$ the fit function is 
+$f(x) = \psi_1(x) + \psi_2(x) + \psi_3(x) + \psi_4(x)$.
 
-If we generalise this function to for any set $A$ it would look something 
+If we generalise this function to any set $A$ it would look something 
 like the following.
 
 $$f(x) = \sum_{i=1}^{|A|}\psi_i(x)$$
