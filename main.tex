@@ -10,6 +10,7 @@
 
 \begin{document}
 \maketitle
+\tableofcontents
 
 \section{Introduction}
 \subsection{Rationale}
@@ -25,9 +26,9 @@ is wrapped into a war-like setting where your function is a projectile, directed
 by your soldiers against your common foes.
 
 It is also usually played without assistance of any external programs like 
-graph plotters or calculators, that's for good reason. The game is considered
-solved: for any initial state of the field there can be deduced a function to
-guarantee a "hit". 
+graph plotters or calculators, that's for good reason. Most importantly, game is
+considered solved: for any initial state of the field there can be deduced a 
+function to guarantee a "hit". 
 
 \subsection{Aim}
 I would want th algorithm to be fully automate, so my ultimate goal 
@@ -40,9 +41,51 @@ The task consists of the small independents subtasks: finding the points and
 fitting the function. 
 
 \subsection{Finding The Points}
+This problem can be boiled down to pathfinding. However, usual pathfinding
+tehcniques operate on discrete spaces like graphs and grids which our spaces
+is difficult to represent.
+
 \subsection{Fitting The Function}
+Let $A$ be a set of length $n$ where each point is like $\langle x, y \rangle$.
+For simplicity we can impose a strict total ordering on the set, and reindex
+it in such way that $\forall a_1,a_2 \in A (a_1 < a_2 \Leftrightarrow a_{1_x} < 
+a_{2_x})$. In this way the $L_n$ is guaranteed to be the rightmost point, which
+will make the mathematics a lot easier. Let's also move the coordinate system
+so that the point at bottom left $\langle -50, -20 \rangle$ is at the origin.
+That will make all the coordinates positive and they are easier to reason about.
+Simple transation $g(p) = \langle p_x + 50, p_y + 20 \rangle, p \in A$ does the
+trick. To reverse this transformation later we might just use $g^{-1}$.
+
+There is an infinite number of ways to make a function that goes through a 
+point, but since we have a generated path as a straight line, 
+we should consider going in a straight line too. 
+The equation of a line $kx + b$ is useful, but it only allows us to
+connect two points, but we have many more. If we express our function as 
+piecewise $u(x)$ we may notice that it resebles the way an absolute value function 
+behaves when expanded at different values of $x$. That function also happens
+to be our target function. 
+
+\begin{equation}
+    \left\{\begin{array}{@{}l@{}}
+        u(x) = k_1x + b_1, x \in [a_{1_x}, a_{2_x}] {}\\
+        u(x) = k_2x + b_2, x \in [a_{2_x}, a_{3_x}] {}\\
+        \cdots\\
+        u(x) = k_nx + b_n, x \in [a_{n-1_x}, a_{n_x}] {}\\
+    \end{array}\right.\,
+    a \in A
+\end{equation}
+
+\section{Limitation}
+This method covers a lot of scenarios, but it doesn't yield correct results
+when the next intended point on the path $a_2$ which goes after some $a_1$
+satisfied $a_{2_x} < a_{1_x}$. Because of the reindexing this changes the order
+of points. Beyond that, this arises only in situations when the $f$ is not
+a well-defined function, since that requires it to have to two different values
+at same $x$. Luckily, those scenarios never occured in a real game. Perhaps 
+the game accounts for that and intentionally avoids it.
 
 \section{Reflection}
+
 \section{Conclusion}
 
 \end{document}
