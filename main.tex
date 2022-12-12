@@ -13,23 +13,18 @@
 
 \author{Artur Roos}
 
-\date{October 2022}
+\date{\today}
 
 \begin{document}
 \maketitle
 \tableofcontents
-
-{
-\centering
-Document compiled \today, made with \LaTeX.
-}
 
 \section{Introduction}
 \subsection{Rationale}
 Not longer than two days ago I was challenged to a mathematical standoff by a 
 good friend of mine, the weapons would be polynomial functions and their 
 graphs. Winning this competition was a matter of honor, so I used all of my 
-skill and wits to prepare. The fight would be held in \mbox{"Graph Wars"}, a 
+skill and wits to prepare. The fight would be held in \mbox{"Graphwar"}, a 
 small competitive 1v1 game published on the 23rd of February 2022. 
 
 The goal of the game is to design a function that can be plotted from one point
@@ -45,9 +40,17 @@ considered solved: for any initial state of the field there can be deduced a
 function to guarantee a "hit". 
 
 \subsection{Aim}
-My ultimate goal  set out to be simply designing an algorithm, which when given
+My ultimate goal set out to be simply designing an algorithm, which when given
 a list of all circle obstacles, their radii, and the edge points would express
 the path to go from to another without colliding with any of the obstacles. 
+
+The plane that the function is plotted on spans 40 units vertically and 
+100 units horizontally. The units and the obstacles can only be placed at 
+integer coordinates. 
+
+You can sketch any function using the list of allowed 
+operations:
+
 
 \section{Investigation}
 The task consists of the small independents subtasks: finding the points and 
@@ -84,11 +87,11 @@ Now we may just normalize the vector to the length.
 
 First we normalize by dividing the vector by it's length.
 \begin{equation}
-    \vec{v'}_{normalized}=\left(\frac{a}{\sqrt{a^2 + b^2}}, \frac{b}{\sqrt{a^2 + b^2}} \right)
+    \vec{v''}_{normalized}=\left(\frac{a}{\sqrt{a^2 + b^2}}, \frac{b}{\sqrt{a^2 + b^2}} \right)
 \end{equation}
 Then we scale the vector by the distance of the line to the origin.
 \begin{equation}
-    \vec{v'}=\vec{v'}_{normalized} * \frac{c}{\sqrt{a^2 + b^2}}
+    \vec{v'}=\vec{v''}_{normalized} * \frac{c}{\sqrt{a^2 + b^2}}
 \end{equation}
 By simplifying the denominators we get
 \begin{equation}
@@ -117,28 +120,39 @@ coordinates $(C_{n_x}, C_{n_y})$ from all the other coordinates. This shifts
 the entire plane so that the circle is at the origin, the precise usecase the
 solution above covers.
 
+Assuming the algorithm is not ill-formed and given correct input information
+it should formulate a near-optimal path, some list $A$ of cardinality $n$, 
+where each point is represted as  a pair of $x$ and $y$ coordinates 
+$\langle x, y \rangle$. It is required that all points of $A$ satisfy 
+$\forall a_i,a_{i+1} \in A : a_{i_x} < a_{{i+1}_x}$. If this is not true 
+at some point the path turns back on itself. This game situation is unresolvable 
+(more of that is mentioned in the "Limitations" section).
+
 \subsection{Fitting The Function}
-Let $A$ be a set of cardinality $n$ where each point is like $\langle x, y \rangle$.
-For simplicity we can impose a strict total ordering on the set, and reindex
-it in such way that $\forall a_1,a_2 \in A : a_1 < a_2 \Leftrightarrow a_{1_x} < 
-a_{2_x}$. In this way the $A_n$ is guaranteed to be the rightmost point, which
-will make the calculations a lot easier. Let's also move the coordinate system
-so that the point at bottom left $\langle -50, -20 \rangle$ is at the origin.
-That will make all the coordinates positive and they are easier to reason about.
+
+The fitting algorithm will operate on the list $A$, output by the 
+pathfinding algorithm and assume the same ordering.
+
+$A_n$ is guaranteed to be the rightmost point, which
+will make the calculations a lot more intuitive.
 We may also ignore all the $x$ values in ranges 
 $(-\infty; a_{1_x})$ and $(a_{n_x}; \infty)$, since the function will not be 
 evaluated there at any point.
 
 There is an infinite number of ways to make a function that goes through a set of
-points, the simplest one is the Lagrange's Interpolation which does fit this 
-usecase perfectly. We may follow a specific example and try to generalise it later. 
-For example $A = \{\langle 0, 1 \rangle, \langle 6, 9 \rangle, 
-\langle 17, 4 \rangle, \langle 19, 22 \rangle\}$.
+points, the simplest one is construcing the Lagrange Interpolation Polynomial
+which does fit this usecase perfectly. We may follow a specific example 
+and try to generalise it later. 
 
-First we may try to make a function $\phi_i(x)$ such that it equates to 0 at
-every point, but $x_i$ it should be. For simplicity we may make it equate to 1, this will
-allow for better composability in the future. For example the process for the second point
-might look something like this.
+For example $A = \{\langle 0, 1 \rangle, \langle 6, 9 \rangle, 
+\langle 17, 4 \rangle, \langle 19, 22 \rangle\}$. All the coordinates are
+purposfully picked to be in the first quadrant, since in this way they are
+much easier to visualize.
+
+First we may try to make a function $\phi_i(x)$ such that it equals to 0 at
+every point, but $x_i$. For simplicity we may make it be equal to 1, this will
+allow for better composability in the future. For example the process for 
+the second point might look something like this.
 
 First we use a helper function $\hat{\phi}_2(x)$ make it be zero at all the points, but $x_i$.
 \begin{equation}
@@ -149,7 +163,7 @@ Now the value at $x_2$ is non-zero, we can just devide it by $\hat{\phi}_2(x_2)$
 so it is $1$ at $x_2$.
 
 \begin{equation}
-    \hat{\phi}_2(x_2) = (6 - 0)(6 - 17)(6 - 19)
+    \hat{\phi}_2(x_2) = \hat{\phi}_2(6) = (6 - 0)(6 - 17)(6 - 19)
 \end{equation}
 \begin{equation}
     \phi_2(x) = \frac{(x - 0)(x - 17)(x - 19)}{\hat{\phi}_2(x_2)}
@@ -167,8 +181,10 @@ so it is $1$ at $x_2$.
 \end{tabular}\par
 }
 
+Formally, in this context $\phi_i$ is called a "Lagrange polynomial basis".
 To make $\phi_i$ completely representative of the point at $x_i$ we need to 
-scale it by $y_i$. Let's define a new helper function $\psi_i(x)$.
+scale it's vertical component by $y_i$. Let's define a new helper 
+function $\psi_i(x)$.
 
 \begin{equation}
     \psi_2(x) = y_2 \phi_2(x)
@@ -197,22 +213,35 @@ $\psi_i(x_j) = 0, j \neq i$, yielding an $|A|$th order polynomial.
 So for the example set $A$ the fit function is 
 $f(x) = \psi_1(x) + \psi_2(x) + \psi_3(x) + \psi_4(x)$.
 
-If we generalise this function to any set $A$ it would look something 
+If we generalise this function to any set $A$ it would look
 like the following.
 
-$$f(x) = \sum_{i=1}^{|A|}\psi_i(x)$$
+\begin{equation}
+    f(x) = \sum_{i=1}^{|A|}\psi_i(x)
+\end{equation}
+
+We can also expand our helper functions $\phi$ and $\psi$, so we get it to our 
+final form.
 $$\psi_i(x) = y_i \phi_i(x)$$
 \begin{equation}
     \phi_i = \prod_{j=1, j \neq i}^{|A|}\frac{x - x_j}{x_i - x_j}
 \end{equation}
+
+The final form is the following, a proper Lagrange Interpolation Polynomial,
+a member of $P_n$. The 
 \begin{equation}
 f(x) = \sum_{i=1}^{|A|} \left(y_i * \prod_{j=1, j \neq i}^{|A|} \frac{x - x_j}{x_i - x_j}\right)
 \end{equation}
 
+This is the final form of the function $f$, that given a set of points 
+fits a function through them. When applying it in practise one should 
+not forget to account for the previously applied transformations, such as 
+the offset of the soldier's origin.
+
 \section{Limitations \& Reflection}
 I used a geometric approach to finding intersections of lines with circles.
 The algebraic solution has a higher computational error due to imprecisions 
-when using floating-point arithmetic. This doesn't impact the current usecase,
+of floating-point arithmetic. This doesn't impact the current usecase,
 however can be important when dealing with more fine point placement.
 
 The described method of fitting covers a lot of scenarios, but it doesn't yield 
@@ -236,7 +265,20 @@ alternative solutions would be using splines to form B\'{e}zier Curves,
 Hermite Curves, Catmul-Rom or even B-Splines, but those are \textbf{barely touched 
 on in the book} if at all.
 
+The origin of each soldiers' shot is unique. The $x$ 
+coordinate is $0$, but the $y$ is same as that of the soldier. The investigation
+conciously ignores this restriction since it would make the solution overwhelming
+and difficult to read. Accounting for that requires subtracting the soldier's 
+position from the each of the path points.
+
 \section{Conclusion}
+In conclusion I can for sure regard this research as successful. All the
+described techniques were applied and achieved great results. I won the
+standoff and got to explain my methodology to the defeated opponent, which
+was delightful. Beyond that, several possible improvements were already 
+mentioned above. I would be interested in redoing that research in some time
+to see how my understanding of the topic has changed with the knowledge I will
+develop.
 \TODO
 
 \section{Bibliography}
