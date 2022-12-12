@@ -9,7 +9,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 
-\title{Obstacle-avoidant Function Fitting}
+\title{Winning The "Graph Wars"}
 
 \author{Artur Roos}
 
@@ -50,12 +50,14 @@ integer coordinates.
 
 You can sketch any function using the list of allowed 
 operations:
+\TODO
 
 
 \section{Investigation}
 The task consists of the small independents subtasks: finding the points and 
-fitting the function. Task-specific restrictions are mentioned in the 
-corresponding section.
+fitting the function. The found points are passed into the fitting algorithm,
+so it in general it is a 2-step pipeline. Some alternative approaches use
+more stages, as mentioned in the "Limitations \& Reflection" section. 
 
 \subsection{Finding The Points}
 This problem can be boiled down to pathfinding. However, usual pathfinding
@@ -126,7 +128,7 @@ where each point is represted as  a pair of $x$ and $y$ coordinates
 $\langle x, y \rangle$. It is required that all points of $A$ satisfy 
 $\forall a_i,a_{i+1} \in A : a_{i_x} < a_{{i+1}_x}$. If this is not true 
 at some point the path turns back on itself. This game situation is unresolvable 
-(more of that is mentioned in the "Limitations" section).
+(more of that is mentioned in the "Limitations \& Reflection" section).
 
 \subsection{Fitting The Function}
 
@@ -236,13 +238,21 @@ f(x) = \sum_{i=1}^{|A|} \left(y_i * \prod_{j=1, j \neq i}^{|A|} \frac{x - x_j}{x
 This is the final form of the function $f$, that given a set of points 
 fits a function through them. When applying it in practise one should 
 not forget to account for the previously applied transformations, such as 
-the offset of the soldier's origin.
+the offset of the soldier's origin. It's (na\"ive) computational complexity
+is $O(n^2)$, which is subpar, possible improvements are mentioned in the 
+"Limitations \& Reflection" section.
 
 \section{Limitations \& Reflection}
 I used a geometric approach to finding intersections of lines with circles.
 The algebraic solution has a higher computational error due to imprecisions 
 of floating-point arithmetic. This doesn't impact the current usecase,
 however can be important when dealing with more fine point placement.
+
+The origin of each soldiers' shot is unique. The $x$ 
+coordinate is $0$, but the $y$ is same as that of the soldier. The investigation
+conciously ignores this restriction since it would make the solution overwhelming
+and difficult to read. Accounting for that requires subtracting the soldier's 
+position from the each of the path points.
 
 The described method of fitting covers a lot of scenarios, but it doesn't yield 
 correct results
@@ -263,13 +273,16 @@ computational complexity. Since the game field is  limited to span 100 units
 horizontally and 40 units vertically this is not a big problem. One of the
 alternative solutions would be using splines to form B\'{e}zier Curves, 
 Hermite Curves, Catmul-Rom or even B-Splines, but those are \textbf{barely touched 
-on in the book} if at all.
+on in the book} if at all. Using splines would be optimal, beyond that
+a spline of degree $\infty$ for a set of points \textit{is} the Lagrange
+Interpolation. I would really love for them to be included in the cirruculum.
 
-The origin of each soldiers' shot is unique. The $x$ 
-coordinate is $0$, but the $y$ is same as that of the soldier. The investigation
-conciously ignores this restriction since it would make the solution overwhelming
-and difficult to read. Accounting for that requires subtracting the soldier's 
-position from the each of the path points.
+All the solutions later developed by other people interested in the game employ
+similar approaches with some optimisations on the algorithm side. Some also
+make use of CV (Computer Vision) to automatically dispatch the data to the
+calculator which later forms a polynomial. Several applications use
+an additional step of the pipeline to optimise the resulting polynomial
+by approximating it further using other techniques.
 
 \section{Conclusion}
 In conclusion I can for sure regard this research as successful. All the
