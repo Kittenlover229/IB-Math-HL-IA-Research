@@ -62,49 +62,59 @@ Since obstacle circles only occur at integer coordinates and the smallest
 radius of a circle is 1, we can safely assume that the smallest size of a grid
 cell we might need is 1 respectively. After that we can apply the \textbf{Theta*}.
 It is preferable to Dijkstra's, A* and others since it is designed to fit
-any-angle pathfinding. Even though our points are aligned on a grid,
+any-angle pathfinding. It can find near-optimal paths with runtimes comparable
+to A*. Even though our points are aligned on a grid,
 the "projectile" is allowed to move in all directions, not just the cardinal ones. 
 Only additional piece of information it requires is a line of sight function ($L$).
 Let $I(A, B)$ be some function, equal to the amount of intersections of a 
 line between points $A$ and $B$  with all the circles of a set $C$ containing 
-$\langle x, y, r \rangle$. So $I_i(A, B)$ is the amount of intersections
-of a line from $A$ to $B$ with some circle $C_i$. 
-Using that we can define $I(A, B) = \sum_{i=1}^{|C|}I_i(A, B)$.
+$\langle x, y, r \rangle$. So $I_n(A, B)$ is the amount of intersections
+of a line from $A$ to $B$ with some circle $C_n$. 
+Using that we can define $I(A, B) = \sum_{n=1}^{|C|}I_n(A, B)$.
 
 For simplicity let's assume the circle is at $\langle 0, 0 \rangle$ with
-some radius $r$. The \textbf{line} of sight between two points $p_1$ and $p_2$
-can be expressed as some $y = kx + b'$. 
-But first let's find the point ($p_0 = (x_0, y_0)$) on the line closest to the circle.
-If we rearrange our equation to be $ax + by + c = 0$ we can for sure say that 
-vector $\vec{v^{\star\star}} = (a, b)$ will be perpendicular to the line.
+some radius $r$.
+But first let's find the point $p_0 = (x_0, y_0)$ on the line closest to the circle.
+We can use an alternative line equation $ax + by + c = 0$ for which we can for sure say that 
+vector $\vec{v''} = (a, b)$ will be perpendicular to the line.
 
+Coordiantes of $p_0$ should be proportional to the vector $\vec{v''}$. 
+Now we may just normalize the vector to the length.
+
+First we normalize by dividing the vector by it's length.
 \begin{equation}
-    k = \frac{p_{1_y} - p_{2_y}}{p_{1_x} - p_{2_x}}
+    \vec{v'}_{normalized}=\left(\frac{a}{\sqrt{a^2 + b^2}}, \frac{b}{\sqrt{a^2 + b^2}} \right)
 \end{equation}
+Then we scale the vector by the distance of the line to the origin.
 \begin{equation}
-    b' = p_{1_x}
+    \vec{v'}=\vec{v'}_{normalized} * \frac{c}{\sqrt{a^2 + b^2}}
 \end{equation}
-
-Coordiantes of $p_0$ should be proportional to the vector $\vec{v^{\star\star}}$. 
-Furthermore, the distance
-of $p_0$ from the origin is $d = \frac{|c|}{\sqrt{a^2 + b^2}}$.
-Now we may just normalize the vector to the length (distance from origin).
-
+By simplifying the denominators we get
 \begin{equation}
-    \vec{v^\star}=\left(a * \frac{c}{a^2 + b^2}, b * \frac{c}{a^2 + b^2}\right)
+    \vec{v}=\left(a * \frac{c}{a^2 + b^2}, b * \frac{c}{a^2 + b^2}\right)
 \end{equation}
 
 This vector is inverted, so by multiplying everything by $-1$ we get the actual 
-coordinates of the point.
-
+coordinates of the point. Since the vector and the point lie in the same coordinate
+system we can claim their equivalence, therefore
 \begin{equation}
-    x_0 = -a * \frac{c}{a^2 + b^2}
+    p_0 = -\vec{v} = (-a * \frac{c}{a^2 + b^2}, -b * \frac{c}{a^2 + b^2}) = (x_0, y_0)
 \end{equation}
+So $p_0$ is the closest point to the circle.
+Now, based on this we can calculate the amount of intersections: if $p_0$ is inside
+the circle there are 2 intersections, it it lies on the radius there is 1 intersection
+and there are none otherwise.
 \begin{equation}
-    y_0 = -b * \frac{c}{a^2 + b^2}
+    \left\{\begin{array}{@{}l@{}}
+       I_n(A, B) = 0, |\vec{v}| > C_{n_r}\\
+       I_n(A, B) = 1, |\vec{v}| = C_{n_r}\\
+       I_n(A, B) = 2, |\vec{v}| < C_{n_r}
+    \end{array}\right.
 \end{equation}
-
-\TODO
+When evaluating the function $I_n$ for simplicity we just subtract the 
+coordinates $(C_{n_x}, C_{n_y})$ from all the other coordinates. This shifts 
+the entire plane so that the circle is at the origin, the precise usecase the
+solution above covers.
 
 \subsection{Fitting The Function}
 Let $A$ be a set of cardinality $n$ where each point is like $\langle x, y \rangle$.
