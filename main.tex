@@ -72,7 +72,9 @@ It is preferable to Dijkstra's, A* and others since it is designed to fit
 any-angle pathfinding. It can find near-optimal paths with runtimes comparable
 to A*. Even though our points are aligned on a grid,
 the "projectile" is allowed to move in all directions, not just the cardinal ones. 
-Only additional piece of information it requires is a line of sight function ($L$).
+Only additional piece of information it requires is a line of sight predicate $P$,
+which in turn requires a function to count the amount of objects that block the
+sight, let's name that function $L$ and try to define it.
 Let $I(A, B)$ be some function, equal to the amount of intersections of a 
 line between points $A$ and $B$  with all the circles of a set $C$ containing 
 $\langle x, y, r \rangle$. So $I_n(A, B)$ is the amount of intersections
@@ -82,8 +84,14 @@ Using that we can define $I(A, B) = \sum_{n=1}^{|C|}I_n(A, B)$.
 For simplicity let's assume the circle is at $\langle 0, 0 \rangle$ with
 some radius $r$.
 But first let's find the point $p_0 = (x_0, y_0)$ on the line closest to the circle.
-We can use an alternative line equation $ax + by + c = 0$ for which we can for sure say that 
-vector $\vec{v''} = (a, b)$ will be perpendicular to the line.
+We can use an alternative line equation $ax + by + c = 0$.
+It also defines a vector $\vec{v'''} = (a, b)$ perpendicular to it.
+To ensure that $\vec{v'''}$ is perpendicular to the line we can proove it.
+Imagine two points $u_1 = (0, 0)$ and $u_2 = (1, -\frac{a}{b})$, they
+both line on the previously described line and form a
+vector $\vec{u} = \vec{u_1u}_2 = (1, -\frac{a}{b})$. $\pi/2 = \arccos(\vec{u} \cdot \vec{v'''})$,
+therefore the vectors are perpendicular. Since $\vec{u}$ is parallel to the line
+any vectors perpendicular to it will be also perpendicular to the line.
 
 Coordiantes of $p_0$ should be proportional to the vector $\vec{v''}$. 
 Now we may just normalize the vector to the length.
@@ -121,7 +129,19 @@ and there are none otherwise.
 When evaluating the function $I_n$ for simplicity we just subtract the 
 coordinates $(C_{n_x}, C_{n_y})$ from all the other coordinates. This shifts 
 the entire plane so that the circle is at the origin, the precise usecase the
-solution above covers.
+solution above covers. Using that we can define our line of sight function.
+
+$$L(A, B) = \sum^{|C|}_{n=1}I_n(A, B)$$
+
+This function is 0 when no intersections are found and $> 0$ when there is
+at least one intersection, we can also convert it into a predicate $P(A, B)$ like this.
+
+\begin{equation}
+    \left\{\begin{array}{@{}l@{}}
+       P(A, B) = 1, L(A, B) = 0\\
+       P(A, B) = 0, L(A, B) > 0\\
+    \end{array}\right.
+\end{equation}
 
 Assuming the algorithm is not ill-formed and given correct input information
 it should formulate a near-optimal path, some list $A$ of cardinality $n$, 
