@@ -156,13 +156,15 @@ The example below should make everything described above more graspable.
 \begin{center}
     \begin{tikzpicture}[scale=0.1]
         \clip (-50,-20) rectangle (50,20);
-        \draw[step=5,gray,very thin] (-49,-19) grid (49,19);
-        \draw (-50,0) -- (50,0);
-        \draw (0,-20) -- (0,20);
+        \draw[gray] (-50,0) -- (50,0);
+        \draw[gray] (0,-20) -- (0,20);
         
         \draw (-35,-15) circle [radius=1cm]; %me 1
+        \node[label={0:$S_2$}] at (-35,-12.5) {};
         \draw (-10,5) circle [radius=1cm]; %me 2
+        \node[label={0:$S_1$}] at (-10,5) {};
         \draw (10,-15) circle [radius=1cm]; %them
+        \node[label={0:$E$}] at (10,-15) {};
         
         \draw (-10,-15) circle [radius=10cm];
         \draw (-50,20) circle [radius=15cm];
@@ -325,7 +327,8 @@ alternative solutions would be using splines to form B\'{e}zier Curves,
 Hermite Curves, Catmul-Rom or even B-Splines, but those are \textbf{barely touched 
 on in the book} if at all. Using splines would be optimal, beyond that
 a spline of degree $\infty$ for a set of points \textit{is} the Lagrange
-Interpolation. I would really love for them to be included in the cirruculum.
+Interpolation. I would really love to see them included in the 
+curriculum.
 
 All the solutions later developed by other people interested in the game employ
 similar approaches with some optimisations on the algorithm side. Some also
@@ -352,7 +355,6 @@ develop.
 \begin{center}
 \begin{tikzpicture}[scale=0.1]
     \clip (-50,-20) rectangle (50,20);
-    \draw[step=5,gray,very thin] (-49,-19) grid (49,19);
     \draw (-50,0) -- (50,0);
     \draw (0,-20) -- (0,20);
     
@@ -366,8 +368,8 @@ develop.
     \draw (30,10) circle [radius=20cm];
     \draw[gray] (30,10) circle [radius=22.5cm];
 
-    \draw[red] plot coordinates {(-35,-15) (-13.5,-2.5) (-7.1,-2.5) (10,-10)};
     \draw[color=blue,domain=-20:0] plot[mark=x,smooth] file {plots/conclusion-function.table};
+    \draw[red] plot coordinates {(-35,-15) (-13.5,-2.5) (-7.1,-2.5) (10,-10)};
 \end{tikzpicture}
 \end{center}
 A representation of a game field with function $f$ generated using my
