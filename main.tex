@@ -10,6 +10,8 @@
 \usepackage[english]{babel}
 \newcommand{\TODO}{\begin{center}\color{red}TODO\end{center}}
 \usepackage{fancyhdr}
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*}{\section}{}{}
 \pagestyle{fancy}
 
 \title{Winning The "Graph Wars"}
@@ -403,8 +405,13 @@ mentioned above. I would be interested in redoing that research in some time
 to see how my understanding of the topic has changed with the knowledge I will
 develop.
 
-\section{Bibliography}
-\appendix
-\TODO
+\begin{thebibliography}{1}
+
+\bibitem{polynomial}
+Archer, Branden and Weisstein, Eric W. {\em Lagrange Interpolating Polynomial.}
+From MathWorld--A Wolfram Web Resource. https://mathworld.wolfram.com/LagrangeInterpolatingPolynomial.html 
+
+\end{thebibliography}
+  
 
 \end{document}
