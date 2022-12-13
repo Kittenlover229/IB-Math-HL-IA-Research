@@ -1,4 +1,6 @@
 \documentclass[12pt, titlepage]{article}
+\usepackage{amsmath}
+\DeclareMathOperator{\sgn}{sgn}
 \usepackage{tikz}
 \usepackage[skip=5pt plus1pt, indent=20pt]{parskip}
 \usepackage{indentfirst}
@@ -51,8 +53,15 @@ integer coordinates.
 
 You can sketch any function using the list of allowed 
 operations:
-\TODO
 
+{
+\centering
+\begin{tabular}{c c c c}
+    $+$ & $-$ & $*$ & $/$ \\
+    $\mathrm{pow}$ & $\mathrm{sin}$ & $\mathrm{cos}$ & $\mathrm{tan}$\\
+    $\mathrm{ln}$ & $\mathrm{log}$ & $\mathrm{exp}$ & $\mathrm{abs}$\\
+\end{tabular}\par
+}
 
 \section{Investigation}
 The task consists of the small independents subtasks: finding the points and 
@@ -83,48 +92,41 @@ Using that we can define $I(p_1, p_2) = \sum_{n=1}^{|C|}I_n(p_1, p_2)$.
 
 For simplicity let's assume the circle is at $\langle 0, 0 \rangle$ with
 some radius $r$.
-But first let's find the point $p_0 = (x_0, y_0)$ on the line closest to the circle.
-We can use an alternative line equation $ax + by + c = 0$.
-It also defines a vector $\vec{v'} = (a, b)$ perpendicular to it.
-To ensure that $\vec{v'}$ is perpendicular to the line we can proove it.
-Imagine two points $u_1 = (0, 0)$ and $u_2 = (1, -\frac{a}{b})$, they
-both line on the previously described line and form a
-vector $\vec{u} = \vec{u_1u}_2 = (1, -\frac{a}{b})$. $\pi/2 = \arccos(\vec{u} \cdot \vec{v'})$,
-therefore the vectors are perpendicular. Since $\vec{u}$ is parallel to the line
-any vectors perpendicular to it will be also perpendicular to the line.
-
-Coordinates of $p_0$ should be proportional to the vector $\vec{v'}$. 
-Now we may just normalize the vector to the length.
-
-First we normalize by dividing the vector by it's length.
-
+So let there be some line $y = kx + b$, the coefficients for each are easy to find.
 \begin{equation}
-    \vec{v}_{normalized}=\left(\frac{a}{\sqrt{a^2 + b^2}}, \frac{b}{\sqrt{a^2 + b^2}} \right)
+    k = \frac{p_{2_y}-p_{1_y}}{p_{2_x}-p_{1_x}}
 \end{equation}
-Then we scale the vector by the distance of the line to the origin.
 \begin{equation}
-    \vec{v}=\vec{v}_{normalized} \times \frac{c}{\sqrt{a^2 + b^2}}
-\end{equation}
-By simplifying the denominators we get
-\begin{equation}
-    \vec{v}=\left(a \frac{c}{a^2 + b^2}, b \frac{c}{a^2 + b^2}\right)
+    b = p_{1_y} - k p_{1_x} = p_{2_y} - k p_{2_x} 
 \end{equation}
 
-This vector is inverted, so by multiplying everything by $-1$ we get the actual 
-coordinates of the point. Since the vector and the point lie in the same coordinate
-system and are relative to $(0, 0)$, we can claim their equivalence, therefore
+Distance between the closest point on this line and the origin (where the center
+of the circle is) is a little trickier to find. We can look at the right-angled triangle, formed
+by the line and it's intercepts. We may use such points as the origin $(0, 0)$, 
+x-intercept $(-\frac{b}{k}, 0)$ and y-intercept $(0, b)$.
+
+They will give us the area of the triangle, that being
 \begin{equation}
-    p_0 = -\vec{v} = (-a \frac{c}{a^2 + b^2}, -b \frac{c}{a^2 + b^2}) = (x_0, y_0)
+    S = \frac{-\frac{b}{k} \times b}{2}  = -\frac{b^2}{2k}
 \end{equation}
-So $p_0$ is the closest point to the circle.
-Now, based on this we can calculate the amount of intersections: if $p_0$ is inside
-the circle there are 2 intersections, if it lies on the radius there is 1 intersection
-and there are none otherwise.
+Also, a hypothenuse of the triangle will be necessary
+\begin{equation}
+    c = \sqrt{\left(-\frac{b}{k}\right)^2 + b^2} = \sqrt{\frac{b^2 + k^2b^2}{k^2}} = \sqrt{1+k^2}\left|\frac{b}{k}\right|
+\end{equation}
+From the two previous equations we can derive the height of the triangle.
+\begin{equation}
+    h = \frac{2S}{c} = \frac{-\frac{b^2}{k}}{\sqrt{1+k^2}\left|\frac{b}{k}\right|} = \frac{|b|}{\sqrt{1 + k^2}}
+\end{equation}
+
+Now, based on this we can calculate the amount of intersections, if the distance
+of the line is greater than the circle's radius they don't intersect,
+if they are equal there is one point of contact and the line is tangential,
+otherwise there 2 intersections.
 \begin{equation}
     \left\{\begin{array}{@{}l@{}}
-       I_n(p_1, p_2) = 0, |\vec{v}| > C_{n_r}\\
-       I_n(p_1, p_2) = 1, |\vec{v}| = C_{n_r}\\
-       I_n(p_1, p_2) = 2, |\vec{v}| < C_{n_r}
+       I_n(p_1, p_2) = 0, h > C_{n_r}\\
+       I_n(p_1, p_2) = 1, h = C_{n_r}\\
+       I_n(p_1, p_2) = 2, h < C_{n_r}
     \end{array}\right.
 \end{equation}
 When evaluating the function $I_n$ for simplicity we just subtract the 
@@ -144,13 +146,6 @@ at least one intersection, we can also convert it into a predicate $P(p_1, p_2)$
     \end{array}\right.
 \end{equation}
 
-Assuming the algorithm is not ill-formed and given correct input information
-it should formulate a near-optimal path, some list $A$ of cardinality $n$, 
-where each point is represted as  a pair of $x$ and $y$ coordinates 
-$\langle x, y \rangle$. It is required that all points of $A$ satisfy 
-$\forall a_i,a_{i+1} \in A : a_{i_x} < a_{{i+1}_x}$. If this is not true 
-at some point the path turns back on itself. This game situation is unresolvable 
-(more of that is mentioned in the "Limitations \& Reflection" section).
 The example below should make everything described above more graspable.
 
 \begin{center}
@@ -179,8 +174,15 @@ In the figure above the blue lines represent the line of sight. The line
 is blue all the way if the value of $P$ for the two points the line connects
 is $1$, it becomes red when the first intersection occurs. There exists
 a clear line of sight between points $S_1$ and $E$, but not $S_2$ and $E$.
-\TODO
 \end{center}
+
+Assuming the algorithm is not ill-formed and given correct input information
+it should formulate a near-optimal path, some list $A$ of cardinality $n$, 
+where each point is represted as  a pair of $x$ and $y$ coordinates 
+$\langle x, y \rangle$. It is required that all points of $A$ satisfy 
+$\forall a_i,a_{i+1} \in A : a_{i_x} < a_{{i+1}_x}$. If this is not true 
+at some point the path turns back on itself. This game situation is unresolvable 
+(more of that is mentioned in the "Limitations \& Reflection" section).
 
 \subsection{Fitting The Function}
 
@@ -344,13 +346,6 @@ useful to artifically increase the radius through some function $h(r) = r + t$,
 to ensure that the path is built at least $t$ units away from the cirles.
 
 \section{Conclusion}
-In conclusion I can for sure regard this research as successful. All the
-described techniques were applied and achieved great results. I won the
-standoff and got to explain my methodology to the defeated opponent, which
-was delightful. Beyond that, several possible improvements were already 
-mentioned above. I would be interested in redoing that research in some time
-to see how my understanding of the topic has changed with the knowledge I will
-develop.
 
 \begin{center}
 \begin{tikzpicture}[scale=0.1]
@@ -370,15 +365,15 @@ develop.
 
     \draw[color=blue,domain=-20:0] plot[mark=x,smooth] file {plots/conclusion-function.table};
     \draw[red] plot coordinates {(-35,-15) (-13.5,-2.5) (-7.1,-2.5) (10,-10)};
-\end{tikzpicture}
-\end{center}
-A representation of a game field with function $f$ generated using my
+\end{tikzpicture}\\
+Here is a representation of a game field with function $f$ generated using my
 algorithm. The radii provded to the algorithm were increased by 2.5,
 they are drawn in gray. The path generated by Theta* is drawn in red.
 The path of the generated function is in blue. In this specific case
 the simplified polynomial is like this (the entire process of expansion
 is ommited for the sake of brevity, it  would take an unreasonable amount 
 of time to compute manually and an unreasonable amount of paper to print).
+\end{center}
 
 % smaller dots
 \newcommand\smalldots{\makebox[0.75em][c]{.\hfil.\hfil.}}
@@ -389,7 +384,13 @@ The grayed out term is the offset of the soldier from origin and is not part of 
 Lagrange Interpolation, however it plays an important role in the game and 
 is not to be forgotten about.
 
-\TODO
+In conclusion I can for sure regard this research as successful. All the
+described techniques were applied and achieved great results. I won the
+standoff and got to explain my methodology to the defeated opponent, which
+was delightful. Beyond that, several possible improvements were already 
+mentioned above. I would be interested in redoing that research in some time
+to see how my understanding of the topic has changed with the knowledge I will
+develop.
 
 \section{Bibliography}
 \appendix
