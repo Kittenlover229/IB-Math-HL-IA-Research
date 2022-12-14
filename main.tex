@@ -85,7 +85,7 @@ to A*. Even though our points are aligned on a grid,
 the "projectile" is allowed to move in all directions, not just the cardinal ones. 
 Only additional piece of information it requires is a line of sight predicate $P$,
 which in turn requires a function to count the amount of objects that block the
-sight, let's name that function $L$ and try to define it.
+sight between points $p_1$ and $p_2$.
 Let $I(p_1, p_2)$ be some function, equal to the amount of intersections of a 
 line between points $p_1$ and $p_2$  with all the circles of a set $C$ containing 
 $\langle x, y, r \rangle$. So $I_n(p_1, p_2)$ is the amount of intersections
@@ -110,7 +110,7 @@ $\frac{b}{k}$ because it's the length of the side, not just the coordinate.
 
 They will give us the area of the triangle, that being
 \begin{equation}
-    S = \frac{\left|-\frac{b}{k}\right| \times b}{2}  = \frac{b^2}{2k}
+    S = \frac{\frac{b}{k} \times b}{2}  = \frac{b^2}{2k}
 \end{equation}
 Also, a hypothenuse of the triangle will be necessary
 \begin{equation}
@@ -136,16 +136,13 @@ When evaluating the function $I_n$ for simplicity we just subtract the
 coordinates $(C_{n_x}, C_{n_y})$ from all the other coordinates. This shifts 
 the entire plane so that the circle is at the origin, the precise usecase the
 solution above covers. Using that we can define our line of sight function.
-
-$$L(A, B) = \sum^{|C|}_{n=1}I_n(p_1, p_2)$$
-
 This function is 0 when no intersections are found and $> 0$ when there is
 at least one intersection, we can also convert it into a predicate $P(p_1, p_2)$ like this.
 
 \begin{equation}
     \left\{\begin{array}{@{}l@{}}
-       P(p_1, p_2) = 1, L(p_1, p_2) = 0\\
-       P(p_1, p_2) = 0, L(p_1, p_2) > 0\\
+       P(p_1, p_2) = 1, I(p_1, p_2) = 0\\
+       P(p_1, p_2) = 0, I(p_1, p_2) > 0\\
     \end{array}\right.
 \end{equation}
 
@@ -182,15 +179,15 @@ a clear line of sight between points $S_1$ and $E$, but not $S_2$ and $E$.
 Assuming the algorithm is not ill-formed and given correct input information
 it should formulate a near-optimal path, some list $A$ of cardinality $n$, 
 where each point is represted as  a pair of $x$ and $y$ coordinates 
-$\langle x, y \rangle$. It is required that all points of $A$ satisfy 
-$\forall a_i,a_{i+1} \in A : a_{i_x} < a_{{i+1}_x}$. If this is not true 
+$\langle x, y \rangle$. It is required that
+$\forall a_i,a_{i+1} \in A : a_{i_x} < a_{{(i+1)}_x}$. If this is not true 
 at some point the path turns back on itself. This game situation is unresolvable 
 (more of that is mentioned in the "Limitations \& Reflection" section).
 
 \subsection{Fitting The Function}
 
 The fitting algorithm will operate on the list $A$, output by the 
-pathfinding algorithm and assume the same ordering.
+pathfinding algorithm and assume the same ordering and $n = |A|$.
 
 $A_n$ is guaranteed to be the rightmost point, which
 will make the calculations a lot more intuitive.
@@ -213,12 +210,12 @@ every point, but $x_i$. For simplicity we may make it be equal to 1, this will
 allow for better composability in the future. For example the process for 
 the second point might look something like this.
 
-First we use a helper function $\hat{\phi}_2(x)$ make it be zero at all the points, but $x_i$.
+First we use a helper function $\hat{\phi}_2(x)$ make it be zero at all the points, but $x_2$.
 \begin{equation}
     \hat{\phi}_2(x) = (x - 0)(x - 17)(x - 19)
 \end{equation}
 
-Now the value at $x_2$ is non-zero, we can just devide it by $\hat{\phi}_2(x_2)$ 
+Now the value at $x_2$ is non-zero, we can just divide it by $\hat{\phi}_2(x_2)$ 
 so it is $1$ at $x_2$.
 
 \begin{equation}
@@ -236,6 +233,7 @@ so it is $1$ at $x_2$.
 \centering
 \begin{tabular}{c|c c c c}
     $x$ & $x_1$ & $x_2$ & $x_3$ & $x_4$ \\
+    \hline
     $\phi_2(x)$ & $0$ & $1$ & $0$ & $0$ \\
 \end{tabular}\par
 }
@@ -266,9 +264,10 @@ Based on this we can express $\psi_i(x)$'s values for any $x_i$.
 \end{tabular}\par
 }
 
-Looking at the table of all the values of $\psi_i$ we can deducde that their linear
+Looking at the table of all the values of $\psi_i$ we can deduce that their linear
 combination will satisfy our condition of $\psi_i(x_i) = y_i$ and 
-$\psi_i(x_j) = 0, j \neq i$, yielding an $|A|$th order polynomial. 
+$\psi_i(x_j) = 0, j \neq i$, yielding a polynomial of the same order $n$
+as the cardinality of the input points.
 So for the example set $A$ the fit function is 
 $f(x) = \psi_1(x) + \psi_2(x) + \psi_3(x) + \psi_4(x)$.
 
@@ -276,20 +275,20 @@ If we generalise this function to any set $A$ it would look
 like the following.
 
 \begin{equation}
-    f(x) = \sum_{i=1}^{|A|}\psi_i(x)
+    f(x) = \sum_{i=1}^{n}\psi_i(x)
 \end{equation}
 
 We can also expand our helper functions $\phi$ and $\psi$, so we get it to our 
 final form.
 $$\psi_i(x) = y_i \phi_i(x)$$
 \begin{equation}
-    \phi_i = \prod_{j=1, j \neq i}^{|A|}\frac{x - x_j}{x_i - x_j}
+    \phi_i = \prod_{j=1, j \neq i}^{n}\frac{x - x_j}{x_i - x_j}
 \end{equation}
 
 The final form is the following, a proper Lagrange Interpolation Polynomial,
 a member of $P_n$. 
 \begin{equation}
-f(x) = \sum_{i=1}^{|A|} \left(y_i * \prod_{j=1, j \neq i}^{|A|} \frac{x - x_j}{x_i - x_j}\right)
+f(x) = \sum_{i=1}^{n} \left(y_i * \prod_{j=1, j \neq i}^{n} \frac{x - x_j}{x_i - x_j}\right)
 \end{equation}
 
 This is the final form of the function $f$, that given a set of points 
@@ -304,12 +303,6 @@ I used a geometric approach to finding intersections of lines with circles.
 The algebraic solution has a higher computational error due to imprecisions 
 of floating-point arithmetic. This doesn't impact the current usecase,
 however can be important when dealing with more fine point placement.
-
-The origin of each soldiers' shot is unique. The $x$ 
-coordinate is $0$, but the $y$ is same as that of the soldier. The investigation
-conciously ignores this restriction since it would make the solution overwhelming
-and difficult to read. Accounting for that requires subtracting the soldier's 
-position from the each of the path points.
 
 The described method of fitting covers a lot of scenarios, but it doesn't yield 
 correct results
@@ -352,7 +345,7 @@ The game has changes a lot since I started the project, the developer
 is very active on it, the latest features include customizable 
 field size and backwards-compatability breaking changes, such as ignoring the 
 y-intercept of a function entirely so the function starts at the position
-of the shooting soldier.
+of the shooting soldier and much more.
 
 \section{Conclusion}
 
