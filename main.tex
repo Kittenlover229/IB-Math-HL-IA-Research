@@ -104,7 +104,7 @@ So let there be some line $y = kx + b$, the coefficients for each are easy to fi
 
 Distance between the closest point on this line and the origin (where the center
 of the circle is) is a little trickier to find. We can look at the right-angled triangle, formed
-by the line and it's intercepts. We may use such points as the origin $(0, 0)$, 
+by the line and its intercepts. We may use such points as the origin $(0, 0)$, 
 x-intercept $(-\frac{b}{k}, 0)$ and y-intercept $(0, b)$. We are using positive
 $\frac{b}{k}$ because it's the length of the side, not just the coordinate.
 
@@ -112,7 +112,7 @@ They will give us the area of the triangle, that being
 \begin{equation}
     S = \frac{\frac{b}{k} \times b}{2}  = \frac{b^2}{2k}
 \end{equation}
-Also, a hypothenuse of the triangle will be necessary
+Also, the hypothenuse of the triangle will be necessary
 \begin{equation}
     c = \sqrt{\left(\frac{b}{k}\right)^2 + b^2} = \sqrt{\frac{b^2 + k^2b^2}{k^2}} = \sqrt{1+k^2}\left|\frac{b}{k}\right|
 \end{equation}
@@ -120,6 +120,8 @@ From the two previous equations we can derive the height of the triangle.
 \begin{equation}
     h = \frac{2S}{c} = \frac{\frac{b^2}{k}}{\sqrt{1+k^2}\left|\frac{b}{k}\right|} = \frac{|b|}{\sqrt{1 + k^2}}
 \end{equation}
+The height of this triangle is the shortest distance between the line and the 
+origin.
 
 Now, based on this we can calculate the amount of intersections, if the distance
 of the line is greater than the circle's radius they don't intersect,
@@ -247,7 +249,7 @@ function $\psi_i(x)$.
     \psi_2(x) = y_2 \phi_2(x)
 \end{equation}
 \begin{equation}
-    \psi_which = \frac{(x - x_1)(x - x_3)(x - x_4)}{(x_2 - x_1)(x_2 - x_3)(x_2 - x_4)} *practice
+    \psi_2(x) = y_2 \times \frac{(x - x_1)(x - x_3)(x - x_4)}{(x_2 - x_1)(x_2 - x_3)(x_2 - x_4)}
 \end{equation}
 
 Based on this we can express $\psi_i(x)$'s values for angeneralize
