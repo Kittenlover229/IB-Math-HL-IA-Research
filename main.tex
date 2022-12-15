@@ -238,19 +238,19 @@ so it is $1$ at $x_2$.
 \end{tabular}\par
 }
 
-Formally, in this context $\phi_i$ is called a "Lagrange polynomial basis".
+Formally, in this context, $\phi_i$ is called a "Lagrange polynomial basis".
 To make $\phi_i$ completely representative of the point at $x_i$ we need to 
-scale it's vertical component by $y_i$. Let's define a new helper 
+scale its vertical component by $y_i$. Let's define a new helper 
 function $\psi_i(x)$.
 
 \begin{equation}
     \psi_2(x) = y_2 \phi_2(x)
 \end{equation}
 \begin{equation}
-    \psi_2(x) = \frac{(x - x_1)(x - x_3)(x - x_4)}{(x_2 - x_1)(x_2 - x_3)(x_2 - x_4)} * y_2
+    \psi_which = \frac{(x - x_1)(x - x_3)(x - x_4)}{(x_2 - x_1)(x_2 - x_3)(x_2 - x_4)} *practice
 \end{equation}
 
-Based on this we can express $\psi_i(x)$'s values for any $x_i$.
+Based on this we can express $\psi_i(x)$'s values for angeneralize
 
 {
 \centering
@@ -291,59 +291,57 @@ a member of $P_n$.
 f(x) = \sum_{i=1}^{n} \left(y_i * \prod_{j=1, j \neq i}^{n} \frac{x - x_j}{x_i - x_j}\right)
 \end{equation}
 
-This is the final form of the function $f$, that given a set of points 
-fits a function through them. When applying it in practise one should 
-not forget to account for the previously applied transformations, such as 
-the offset of the soldier's origin. It's (na\"ive) computational complexity
+This is the final form of the function $f$, which given a set of points 
+fits a function through them. It's na\"ive computational complexity
 is $O(n^2)$, which is subpar, possible improvements are mentioned in the 
 "Limitations \& Reflection" section.
 
 \section{Limitations \& Reflection}
 I used a geometric approach to finding intersections of lines with circles.
 The algebraic solution has a higher computational error due to imprecisions 
-of floating-point arithmetic. This doesn't impact the current usecase,
-however can be important when dealing with more fine point placement.
+of floating-point arithmetic. This doesn't impact the current use case,
+however, can be important when dealing with more fine point placement.
 
 The described method of fitting covers a lot of scenarios, but it doesn't yield 
 correct results
-when the next intended path point $a_{i + 1}$ on the path which goes after 
-some $a_i$. In this case the pathfinding algorithm requires a path to turn back,
+when the next intended path point $a_{i + 1}$ on the path goes after 
+some $a_i$. In this case, the pathfinding algorithm requires a path to turn back,
 which is impossible to do. This issue is most visible when reindexing: the order
 of points will be changed. Beyond that, this arises only in situations when the 
-$f(x)$ \textbf{can't be a well-defined function}, since that requires it to have to
-two different values at same $x$. Luckily, those scenarios never occured in a 
+$f(x)$ \textbf{can't be a well-defined function}, since that requires it to have 
+two different values at the same $x$. Luckily, those scenarios never occurred in a 
 real game. Perhaps the game accounts for that and intentionally avoids it.
 
 My method produces good results on the given dataset of densely packed points,
 however, the more spread apart the points are the greater the algorithm
 overshoots in spaces between two points. That can be a problem since it may 
-actually accidentally go through one of the circles. This oscillating effect can be
+accidentally go through one of the circles. This oscillating effect (also known as Runge's phenomenon) can be
 mitigated by sampling more intermediate points, which in turn increases 
-computational complexity. Since the game field is  limited to span 100 units
+computational complexity. Since the game field is limited to span 100 units
 horizontally and 40 units vertically this is not a big problem. One of the
 alternative solutions would be using splines to form B\'{e}zier Curves, 
-Hermite Curves, Catmul-Rom or even B-Splines, but those are \textbf{barely touched 
+Hermite Curves, Catmul-Rom, or even B-Splines, but those are \textbf{barely touched 
 on in the book} if at all. Using splines would be optimal, beyond that
 a spline of degree $\infty$ for a set of points \textit{is} the Lagrange
-Interpolation. I would really love to see them included in the 
+Interpolation. I would love to see them included in the 
 curriculum.
 
 All the solutions later developed by other people interested in the game employ
-similar approaches with some optimisations on the algorithm side. Some also
+similar approaches with some optimizations on the algorithm side. Some also
 make use of CV (Computer Vision) to automatically dispatch the data to the
 calculator which later forms a polynomial. Several applications use
-an additional step of the pipeline to optimise the resulting polynomial
+an additional step of the pipeline to optimize the resulting polynomial
 by approximating it further using other techniques.
 
-In some edge-case scenarios errors in floating point arithmetic might 
+In some edge-case scenarios errors in floating-point arithmetic might 
 cause an unintentional collision. Since built paths might be touching 
-the radius of the circle (due to the nature of the algorithm) it might be
-useful to artifically increase the radius through some function $h(r) = r + t$,
-to ensure that the path is built at least $t$ units away from the cirles.
+the radius of the circle (due to the nature of the pathfinding algorithm) it might be
+useful to artificially increase the radius through some function $h(r) = r + t$,
+to ensure that the path is built at least $t$ units away from the circles.
 
 The game has changes a lot since I started the project, the developer 
 is very active on it, the latest features include customizable 
-field size and backwards-compatability breaking changes, such as ignoring the 
+field size and backward-compatibility breaking changes, such as ignoring the 
 y-intercept of a function entirely so the function starts at the position
 of the shooting soldier and much more.
 
@@ -374,32 +372,37 @@ of the shooting soldier and much more.
     \draw[red] plot coordinates {(-35,-15) (-13.5,-2.5) (-7.1,-2.5) (10,-10)};
 \end{tikzpicture}\\
 Here is a representation of a game field with function $f$ generated using my
-algorithm. The radii provded to the algorithm were increased by 2.5,
+algorithm. 
+\end{center}
+
+The radii provided to the algorithm were increased by 2.5,
 they are drawn in dotted gray. The path generated by Theta* is drawn in red.
 The path of the generated function is in blue. In this specific case
 the simplified polynomial is like this (the entire process of expansion
-is ommited for the sake of brevity, it  would take an unreasonable amount 
+is omitted for the sake of brevity, it would take an unreasonable amount 
 of time to compute manually and an unreasonable amount of paper to print).
-\end{center}
 
 % smaller dots
 \newcommand\smalldots{\makebox[0.75em][c]{.\hfil.\hfil.}}
 
 $$f(x) = 4.833\smalldots \times 10^{-5} x^3- 1.181\smalldots{} \times 10^{-2} x^2 - (0.389\smalldots{}) x - 4.335\smalldots$$
 
-In conclusion I can for sure regard this research as successful. All the
+In conclusion, I can for sure regard this research as successful. All the
 described techniques were applied and achieved great results. I won the
 standoff and got to explain my methodology to the defeated opponent, which
 was delightful. Beyond that, several possible improvements were already 
 mentioned above. I would be interested in redoing that research in some time
 to see how my understanding of the topic has changed with the knowledge I will
-develop.
+develop. It has opened my eyes to such areas of mathematics as  Approximation Theory and Mathematical Analysis, which I now hope to study in the future.
 
 \begin{thebibliography}{1}
 
 \bibitem{polynomial}
-Archer, Branden and Weisstein, Eric W. {\em Lagrange Interpolating Polynomial.}
+Archer, Branden, and Weisstein, Eric W. {\em Lagrange Interpolating Polynomial.}
 From MathWorld--A Wolfram Web Resource. https://mathworld.wolfram.com/LagrangeInterpolatingPolynomial.html.
+
+\bibitem{lebesgue}
+Weisstein, Eric W. "Lebesgue Constants." From MathWorld--A Wolfram Web Resource. https://mathworld.wolfram.com/LebesgueConstants.html
 
 \bibitem{savateev}
 Savateev, Aleksei. {\em Linejnaja algebra. Aleksej Savvateev i Aleksandr Tonis. Lekcija 1.1. Interpoljacionnyj mnogochlen.}
@@ -412,8 +415,12 @@ Lucas Catabriga. {\em Graphwar.} Graphwar, 17 Aug 2022, http://www.graphwar.com/
 Holm\'{e}r, Freya. {\em The Continuity of Splines.}
 Youtube, Uploaded by Freya Holm\'{e}r, 07 Dec 2022, https://www.youtube.com/watch?v=jvPPXbo87ds.
 
+\bibitem{runge}
+Runge, Carl (1901), "Über empirische Funktionen und die Interpolation zwischen äquidistanten Ordinaten", Zeitschrift für Mathematik und Physik, 46: 224–243. available at www.archive.org
+
+\bibitem{weierstrass}
+Stone–Weierstrass theorem. Encyclopedia of Mathematics. URL: https://encyclopediaofmath.org/wiki/Stone-Weierstrass\_theorem
 
 \end{thebibliography}
-  
 
 \end{document}
