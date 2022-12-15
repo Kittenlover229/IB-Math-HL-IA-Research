@@ -1,6 +1,5 @@
 \documentclass[12pt, titlepage]{article}
 \usepackage{amsmath}
-\DeclareMathOperator{\sgn}{sgn}
 \usepackage{tikz}
 \usepackage[skip=5pt plus1pt, indent=20pt]{parskip}
 \usepackage{indentfirst}
@@ -11,18 +10,25 @@
 \newcommand{\TODO}{\begin{center}\color{red}TODO\end{center}}
 \usepackage{fancyhdr}
 \usepackage{etoolbox}
+
+\def\url#1{\expandafter\string\csname #1\endcsname}
 \patchcmd{\thebibliography}{\section*}{\section}{}{}
+
 \pagestyle{fancy}
 
 \title{Winning The ``Graph Wars"}
 
 \author{Artur Roos}
 
-\date{\today}
 
 \begin{document}
 \maketitle
 \tableofcontents
+
+\setcounter{secnumdepth}{-1}
+\section{Foreword}
+Document made using \LaTeX \hphantom{ } and compiled \today.\\ \mbox{Contains 2761 words.}
+Presented December 16, 2022.
 
 \section{Introduction}
 \subsection{Rationale}
@@ -186,6 +192,12 @@ $\forall a_i,a_{i+1} \in A : a_{i_x} < a_{{(i+1)}_x}$. If this is not true
 at some point the path turns back on itself. This game situation is unresolvable 
 (more of that is mentioned in the "Limitations \& Reflection" section).
 
+In some edge-case scenarios errors in floating-point arithmetic might 
+cause an unintentional collision. Since built paths might be touching 
+the radius of the circle (due to the nature of the pathfinding algorithm) it might be
+useful to artificially increase the radius through some function $h(r) = r + t$,
+to ensure that the path is built at least $t$ units away from the circles.
+
 \subsection{Fitting The Function}
 
 The fitting algorithm will operate on the list $A$, output by the 
@@ -252,7 +264,7 @@ function $\psi_i(x)$.
     \psi_2(x) = y_2 \times \frac{(x - x_1)(x - x_3)(x - x_4)}{(x_2 - x_1)(x_2 - x_3)(x_2 - x_4)}
 \end{equation}
 
-Based on this we can express $\psi_i(x)$'s values for angeneralize
+Based on this we can express $\psi_i(x)$'s values for the set $A$.
 
 {
 \centering
@@ -273,7 +285,7 @@ as the cardinality of the input points.
 So for the example set $A$ the fit function is 
 $f(x) = \psi_1(x) + \psi_2(x) + \psi_3(x) + \psi_4(x)$.
 
-If we generalise this function to any set $A$ it would look
+If we generalise this function to any list $A$ of cardinality $n$ it would look
 like the following.
 
 \begin{equation}
@@ -299,11 +311,6 @@ is $O(n^2)$, which is subpar, possible improvements are mentioned in the
 "Limitations \& Reflection" section.
 
 \section{Limitations \& Reflection}
-I used a geometric approach to finding intersections of lines with circles.
-The algebraic solution has a higher computational error due to imprecisions 
-of floating-point arithmetic. This doesn't impact the current use case,
-however, can be important when dealing with more fine point placement.
-
 The described method of fitting covers a lot of scenarios, but it doesn't yield 
 correct results
 when the next intended path point $a_{i + 1}$ on the path goes after 
@@ -318,7 +325,7 @@ My method produces good results on the given dataset of densely packed points,
 however, the more spread apart the points are the greater the algorithm
 overshoots in spaces between two points. That can be a problem since it may 
 accidentally go through one of the circles. This oscillating effect (also known as Runge's phenomenon) can be
-mitigated by sampling more intermediate points, which in turn increases 
+mitigated by sampling more intermediate points equidistantly, which in turn increases 
 computational complexity. Since the game field is limited to span 100 units
 horizontally and 40 units vertically this is not a big problem. One of the
 alternative solutions would be using splines to form B\'{e}zier Curves, 
@@ -334,12 +341,6 @@ make use of CV (Computer Vision) to automatically dispatch the data to the
 calculator which later forms a polynomial. Several applications use
 an additional step of the pipeline to optimize the resulting polynomial
 by approximating it further using other techniques.
-
-In some edge-case scenarios errors in floating-point arithmetic might 
-cause an unintentional collision. Since built paths might be touching 
-the radius of the circle (due to the nature of the pathfinding algorithm) it might be
-useful to artificially increase the radius through some function $h(r) = r + t$,
-to ensure that the path is built at least $t$ units away from the circles.
 
 The game has changes a lot since I started the project, the developer 
 is very active on it, the latest features include customizable 
@@ -422,6 +423,9 @@ Runge, Carl (1901), "Über empirische Funktionen und die Interpolation zwischen 
 
 \bibitem{weierstrass}
 Stone–Weierstrass theorem. Encyclopedia of Mathematics. URL: https://encyclopediaofmath.org/wiki/Stone-Weierstrass\_theorem
+
+\bibitem{pacific}
+Bishop, E., 1961. A generalization of the Stone-Weierstrass theorem. Pacific Journal of Mathematics, 11(3), pp.777-783.
 
 \end{thebibliography}
 
